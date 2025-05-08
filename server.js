@@ -1,31 +1,27 @@
 const path = require('path');
 const express = require('express');
+const posts = require('./routes/posts');
+const logger =  require('./middleware/logger.js')
 
 const port = process.env.PORT || 8000;
 const app = express();
 
 
 
+//
+// logger midddleware
+
+
+
+//NODY PARSER MIDDLEWARE
+app.use(express.json())
+app.use(express.urlencoded({extended: false}));
 // Serve static files
  //app.use(express.static( path.join( __dirname, 'public' )))
-//app.use(express.static(path.join(__dirname, 'public')));
- 
+ app.use(logger);
+//route
+app.use('/api/posts',  posts);
 
-let posts = [
-
-    {id:1, title: 'post one'},
-    {id:2 , title: 'post two'},
-    {ide:3, title: 'post three'}
-]
- app.get('/api/posts' , (req, res)  => {
-res.json(posts);
- })
- // single posts 
-
- app.get('/api/posts/:id' , (req, res)  => {
-    console.log(re1)
-    res.json(posts);
-     })
 
 
  
