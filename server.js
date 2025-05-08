@@ -20,6 +20,12 @@ let posts = [
  app.get('/api/posts' , (req, res)  => {
 res.json(posts);
  })
+ // single posts 
+
+ app.get('/api/posts/:id' , (req, res)  => {
+    console.log(re1)
+    res.json(posts);
+     })
 
 
  
