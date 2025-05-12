@@ -3,9 +3,146 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Post Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .post-form {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .post-list {
+            margin-top: 20px;
+        }
+        .post-item {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 70%;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .delete-btn {
+            background: #dc3545;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+    </style>
   </head>
   <body>
-    <h1>try - 1 server manual route </h1>
+    <h1>Post Manager</h1>
+    
+    <div class="post-form">
+        <h2>Add New Post</h2>
+        <form id="postForm">
+            <input type="text" id="postTitle" placeholder="Enter post title" required>
+            <button type="submit">Add Post</button>
+        </form>
+    </div>
+
+    <div class="post-list">
+        <h2>Posts</h2>
+        <div id="postsList"></div>
+    </div>
+
+    <script>
+        // Fetch all posts
+        async function fetchPosts() {
+            try {
+                const response = await fetch('/api/posts');
+                const posts = await response.json();
+                displayPosts(posts);
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+            }
+        }
+
+        // Display posts in the list
+        function displayPosts(posts) {
+            const postsList = document.getElementById('postsList');
+            postsList.innerHTML = '';
+            
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post-item';
+                postElement.innerHTML = `
+                    <span>${post.title}</span>
+                    <button class="delete-btn" onclick="deletePost(${post.id})">Delete</button>
+                `;
+                postsList.appendChild(postElement);
+            });
+        }
+
+        // Add new post
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const titleInput = document.getElementById('postTitle');
+            const title = titleInput.value;
+
+            try {
+                const response = await fetch('/api/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title })
+                });
+
+                if (response.ok) {
+                    titleInput.value = '';
+                    fetchPosts();
+                } else {
+                    console.error('Error adding post');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        // Delete post
+        async function deletePost(id) {
+            try {
+                const response = await fetch(`/api/posts/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    fetchPosts();
+                } else {
+                    console.error('Error deleting post');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Initial load of posts
+        fetchPosts();
+    </script>
   </body>
 </html>
